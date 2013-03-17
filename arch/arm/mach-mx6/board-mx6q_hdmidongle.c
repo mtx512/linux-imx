@@ -75,8 +75,6 @@
 #define HDMIDONGLE_ECSPI2_CS0   IMX_GPIO_NR(2, 26)
 #define HDMIDONGLE_HDMI_CEC_IN	IMX_GPIO_NR(4, 11)
 
-//#define HDMIDONGLE_BT_RST     IMX_GPIO_NR(3, 7)
-//#define HDMIDONGLE_BT_EN      IMX_GPIO_NR(3, 9)
 #define HDMIDONGLE_WL_EN        IMX_GPIO_NR(2, 0)
 
 #define HDMIDONGLE_SD2_CD	IMX_GPIO_NR(6, 11)
@@ -108,9 +106,7 @@ static const struct anatop_thermal_platform_data
 
 static inline void mx6q_hdmidongle_init_uart(void)
 {
-	imx6q_add_imx_uart(0, NULL);
 	imx6q_add_imx_uart(1, NULL);
-	imx6q_add_imx_uart(2, NULL);
 	imx6q_add_imx_uart(3, NULL);
 }
 
@@ -123,8 +119,6 @@ static struct i2c_board_info mxc_i2c1_board_info[] __initdata = {
 		I2C_BOARD_INFO("mxc_hdmi_i2c", 0x50),
 	},
 };
-
-
 
 static void imx6q_hdmidongle_usbotg_vbus(bool on)
 {
@@ -142,7 +136,6 @@ static void __init imx6q_hdmidongle_init_usb(void)
 
 	mx6_set_otghost_vbus_func(imx6q_hdmidongle_usbotg_vbus);
 }
-
 
 static struct viv_gpu_platform_data imx6q_gpu_pdata __initdata = {
 	.reserved_mem_size = SZ_128M + SZ_64M,
@@ -375,7 +368,6 @@ static void __init mx6_hdmidongle_board_init(void)
 	i2c_register_board_info(1, mxc_i2c1_board_info,
 			ARRAY_SIZE(mxc_i2c1_board_info));
 
-
 	imx6q_add_mxc_hdmi(&hdmi_data);
 
 	imx6q_add_anatop_thermal_imx(1, &mx6q_hdmidongle_anatop_thermal_data);
@@ -399,7 +391,7 @@ static void __init mx6_hdmidongle_board_init(void)
 
 	imx6q_add_dvfs_core(&hdmidongle_dvfscore_data);
 
-        #ifndef CONFIG_MX6_INTER_LDO_BYPASS
+        #ifdef CONFIG_MX6_INTER_LDO_BYPASS
         mx6_cpu_regulator_init();
         #endif
 
@@ -410,15 +402,6 @@ static void __init mx6_hdmidongle_board_init(void)
 
 	imx6q_add_hdmi_soc();
 	imx6q_add_hdmi_soc_dai();
-
-        // gpio_request(HDMIDONGLE_BT_RST, "bt_reset");
-        // gpio_direction_output(HDMIDONGLE_BT_RST, 1);
-        // gpio_set_value(HDMIDONGLE_BT_RST, 1);
-        // msleep(1000);
-        // gpio_request(HDMIDONGLE_BT_EN, "bt_en");
-        // gpio_direction_output(HDMIDONGLE_BT_EN, 1);
-        // gpio_set_value(HDMIDONGLE_BT_EN, 1);
-	// msleep(1000);
 
 	gpio_request(HDMIDONGLE_WL_EN, "wl_en");
 	gpio_direction_output(HDMIDONGLE_WL_EN, 1);
