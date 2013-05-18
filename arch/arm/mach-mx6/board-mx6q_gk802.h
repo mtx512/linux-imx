@@ -1,0 +1,150 @@
+/*
+ * Copyright (C) 2012 Freescale Semiconductor, Inc. All Rights Reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+
+#ifndef _BOARD_MX6Q_HDMIDONGLE_H
+#define _BOARD_MX6Q_HDMIDONGLE_H
+#include <mach/iomux-mx6q.h>
+
+static iomux_v3_cfg_t mx6q_hdmidongle_pads[] = {
+
+	/* Match GK802 Android IOMUX Config although we don't know if theirs is
+	 * completely correct */
+
+	/* UART 2 */
+	MX6Q_PAD_EIM_D26__UART2_TXD,
+	MX6Q_PAD_EIM_D27__UART2_RXD,
+	MX6Q_PAD_EIM_D28__UART2_CTS,
+	MX6Q_PAD_EIM_D29__UART2_RTS,
+
+	/* UART4 for debug */
+	MX6Q_PAD_KEY_COL0__UART4_TXD,
+	MX6Q_PAD_KEY_ROW0__UART4_RXD,
+
+	/* UART 5 */
+	MX6Q_PAD_KEY_COL1__UART5_TXD,
+	MX6Q_PAD_KEY_ROW1__UART5_RXD,
+	MX6Q_PAD_KEY_COL4__UART5_RTS,
+	MX6Q_PAD_KEY_ROW4__UART5_CTS,
+
+	/* GPI01 */
+	MX6Q_PAD_GPIO_0__GPIO_1_0, /* SD 2 WP */
+	MX6Q_PAD_GPIO_4__GPIO_1_4,
+	MX6Q_PAD_GPIO_7__GPIO_1_7, /* BT WAKE UP */
+
+	/* GPI02 */
+	MX6Q_PAD_NANDF_D4__GPIO_2_4,
+	MX6Q_PAD_NANDF_D5__GPIO_2_5,  
+	MX6Q_PAD_EIM_CS0__GPIO_2_23,
+	MX6Q_PAD_EIM_CS1__GPIO_2_24,
+	MX6Q_PAD_EIM_EB3__GPIO_2_31,
+	MX6Q_PAD_EIM_EB2__GPIO_2_30,
+
+	/* GPI03 */
+	MX6Q_PAD_EIM_DA2__GPIO_3_2,
+	MX6Q_PAD_EIM_DA3__GPIO_3_3,
+	MX6Q_PAD_EIM_D17__GPIO_3_17,
+	MX6Q_PAD_EIM_D16__GPIO_3_16,
+	MX6Q_PAD_EIM_D18__GPIO_3_18,
+	MX6Q_PAD_EIM_D19__GPIO_3_19,
+	MX6Q_PAD_EIM_D22__GPIO_3_22, /* USB PWR*/
+
+
+	/* GPIO5 */
+	MX6Q_PAD_EIM_WAIT__GPIO_5_0,
+	MX6Q_PAD_EIM_A24__GPIO_5_4,
+
+	/* GPIO6 */
+	MX6Q_PAD_EIM_A23__GPIO_6_6,
+	MX6Q_PAD_NANDF_CS0__GPIO_6_11,  /* SD 2 CMD */
+	MX6Q_PAD_NANDF_CS1__GPIO_6_14,
+	MX6Q_PAD_NANDF_CS3__GPIO_6_16,
+
+	MX6Q_PAD_NANDF_D6__GPIO_2_6,
+
+	MX6Q_PAD_SD2_DAT1__AUDMUX_AUD4_TXFS,
+	MX6Q_PAD_SD2_DAT2__AUDMUX_AUD4_TXD,
+	MX6Q_PAD_SD2_DAT0__AUDMUX_AUD4_RXD,
+	MX6Q_PAD_SD2_DAT3__AUDMUX_AUD4_TXC,
+
+	MX6Q_PAD_EIM_A24__WEIM_WEIM_A_24,
+	MX6Q_PAD_EIM_A23__WEIM_WEIM_A_23,
+	MX6Q_PAD_EIM_RW__WEIM_WEIM_RW,
+	MX6Q_PAD_EIM_WAIT__WEIM_WEIM_WAIT,
+	MX6Q_PAD_EIM_RW__ECSPI2_SS0,
+
+	/* ENET */
+	MX6Q_PAD_ENET_CRS_DV__ESAI1_SCKT,
+	MX6Q_PAD_ENET_RXD1__ESAI1_FST,
+	MX6Q_PAD_ENET_RXD0__ESAI1_HCKT,
+	MX6Q_PAD_ENET_TX_EN__ESAI1_TX3_RX2,
+	MX6Q_PAD_ENET_TXD1__ESAI1_TX2_RX3,
+	MX6Q_PAD_ENET_TXD0__ESAI1_TX4_RX1,
+	MX6Q_PAD_ENET_MDC__ESAI1_TX5_RX0,
+
+	// MX6Q_PAD_GPIO_0__CCM_CLKO,
+	MX6Q_PAD_GPIO_9__PWM1_PWMO,
+	MX6Q_PAD_GPIO_3__CCM_CLKO2,
+
+	MX6Q_PAD_CSI0_PIXCLK__IPU1_CSI0_PIXCLK,
+	MX6Q_PAD_CSI0_MCLK__IPU1_CSI0_HSYNC,
+	MX6Q_PAD_CSI0_VSYNC__IPU1_CSI0_VSYNC,
+
+	MX6Q_PAD_CSI0_DAT12__IPU1_CSI0_D_12,
+	MX6Q_PAD_CSI0_DAT13__IPU1_CSI0_D_13,
+	MX6Q_PAD_CSI0_DAT14__IPU1_CSI0_D_14,
+	MX6Q_PAD_CSI0_DAT15__IPU1_CSI0_D_15,
+	MX6Q_PAD_CSI0_DAT16__IPU1_CSI0_D_16,
+	MX6Q_PAD_CSI0_DAT17__IPU1_CSI0_D_17,
+	MX6Q_PAD_CSI0_DAT18__IPU1_CSI0_D_18,
+	MX6Q_PAD_CSI0_DAT19__IPU1_CSI0_D_19,
+
+	MX6Q_PAD_SD4_DAT6__USDHC4_DAT6_50MHZ,
+
+	/* HDMI CEC communication PIN */
+	MX6Q_PAD_KEY_ROW2__HDMI_TX_CEC_LINE,
+
+	/* USBOTG ID pin */
+	MX6Q_PAD_GPIO_1__USBOTG_ID,
+
+	/* I2C2 Enable HDMI pins for correct detection  */
+	MX6Q_PAD_KEY_COL3__I2C2_SCL,  /* GPIO4[12] */
+	MX6Q_PAD_KEY_ROW3__I2C2_SDA,  /* GPIO4[13] */
+
+	/** Additional tweaks to IOMUX **/
+
+	/* SD 3 */
+	MX6Q_PAD_SD3_CLK__USDHC3_CLK_200MHZ,
+	MX6Q_PAD_SD3_CMD__USDHC3_CMD_200MHZ,
+	MX6Q_PAD_SD3_DAT0__USDHC3_DAT0_200MHZ,
+	MX6Q_PAD_SD3_DAT1__USDHC3_DAT1_200MHZ,
+	MX6Q_PAD_SD3_DAT2__USDHC3_DAT2_200MHZ,
+	MX6Q_PAD_SD3_DAT3__USDHC3_DAT3_200MHZ,
+
+};
+
+static iomux_v3_cfg_t mx6q_hdmidongle_hdmi_ddc_pads[] = {
+	MX6Q_PAD_KEY_COL3__HDMI_TX_DDC_SCL, /* HDMI DDC SCL */
+	MX6Q_PAD_KEY_ROW3__HDMI_TX_DDC_SDA, /* HDMI DDC SDA */
+};
+
+static iomux_v3_cfg_t mx6q_hdmidongle_i2c2_pads[] = {
+	MX6Q_PAD_KEY_COL3__I2C2_SCL,	/* I2C2 SCL */
+	MX6Q_PAD_KEY_ROW3__I2C2_SDA,	/* I2C2 SDA */
+};
+
+#endif
