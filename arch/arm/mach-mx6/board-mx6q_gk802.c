@@ -73,8 +73,8 @@
 #define HDMIDONGLE_WL_EN        IMX_GPIO_NR(2, 0)
 #define HDMIDONGLE_BT_EN        IMX_GPIO_NR(2, 23)
 #define HDMIDONGLE_BT_WK        IMX_GPIO_NR(1, 7)
-#define HDMIDONGLE_SD2_CD	IMX_GPIO_NR(6, 11)
-#define HDIMDONGLE_SD2_WP	IMX_GPIO_NR(1, 0)
+#define HDMIDONGLE_SD2_CD       IMX_GPIO_NR(6, 11)
+#define HDIMDONGLE_SD2_WP       IMX_GPIO_NR(1, 0)
 
 
 extern char *gp_reg_id;
@@ -387,11 +387,11 @@ static void __init mx6_hdmidongle_board_init(void)
 	imx6q_add_hdmi_soc();
 	imx6q_add_hdmi_soc_dai();
 
- 	gpio_request(HDMIDONGLE_WL_EN, "wl_en");
+	gpio_request(HDMIDONGLE_WL_EN, "wl_en");
 	gpio_direction_output(HDMIDONGLE_WL_EN, 1);
 	gpio_set_value(HDMIDONGLE_WL_EN, 1);
 
- 	gpio_request(HDMIDONGLE_BT_EN, "bt_en");
+	gpio_request(HDMIDONGLE_BT_EN, "bt_en");
 	gpio_direction_output(HDMIDONGLE_BT_EN, 1);
 	gpio_set_value(HDMIDONGLE_BT_EN, 0);
 
