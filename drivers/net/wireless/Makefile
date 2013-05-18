@@ -59,3 +59,4 @@ obj-$(CONFIG_IWM)	+= iwmc3200wifi/
 
 obj-$(CONFIG_MWIFIEX)	+= mwifiex/
 #obj-$(CONFIG_ATH6K_LEGACY)	+= ath6kl/
+obj-$(CONFIG_RTL8192CU) += rtl8192cu/
