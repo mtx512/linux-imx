@@ -15,11 +15,11 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef _BOARD_MX6Q_HDMIDONGLE_H
-#define _BOARD_MX6Q_HDMIDONGLE_H
+#ifndef _BOARD_MX6Q_GK802_H
+#define _BOARD_MX6Q_GK802_H
 #include <mach/iomux-mx6q.h>
 
-static iomux_v3_cfg_t mx6q_hdmidongle_pads[] = {
+static iomux_v3_cfg_t mx6q_gk802_pads[] = {
 
 	/* Match GK802 Android IOMUX Config although we don't know if theirs is
 	 * completely correct */
@@ -136,12 +136,12 @@ static iomux_v3_cfg_t mx6q_hdmidongle_pads[] = {
 
 };
 
-static iomux_v3_cfg_t mx6q_hdmidongle_hdmi_ddc_pads[] = {
+static iomux_v3_cfg_t mx6q_gk802_hdmi_ddc_pads[] = {
 	MX6Q_PAD_KEY_COL3__HDMI_TX_DDC_SCL, /* HDMI DDC SCL */
 	MX6Q_PAD_KEY_ROW3__HDMI_TX_DDC_SDA, /* HDMI DDC SDA */
 };
 
-static iomux_v3_cfg_t mx6q_hdmidongle_i2c2_pads[] = {
+static iomux_v3_cfg_t mx6q_gk802_i2c2_pads[] = {
 	MX6Q_PAD_KEY_COL3__I2C2_SCL,	/* I2C2 SCL */
 	MX6Q_PAD_KEY_ROW3__I2C2_SDA,	/* I2C2 SDA */
 };

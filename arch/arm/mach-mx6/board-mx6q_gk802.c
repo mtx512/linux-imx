@@ -80,7 +80,7 @@ extern char *gp_reg_id;
 extern char *soc_reg_id;
 extern char *pu_reg_id;
 
-static const struct esdhc_platform_data mx6q_hdmidongle_sd2_data __initconst = {
+static const struct esdhc_platform_data mx6q_gk802_sd2_data __initconst = {
 	.cd_gpio = HDMIDONGLE_SD2_CD,
 	.wp_gpio = HDIMDONGLE_SD2_WP,
 	.keep_power_at_suspend = 1,
@@ -89,7 +89,7 @@ static const struct esdhc_platform_data mx6q_hdmidongle_sd2_data __initconst = {
 	.cd_type = ESDHC_CD_CONTROLLER,
 };
 
-static const struct esdhc_platform_data mx6q_hdmidongle_sd3_data __initconst = {
+static const struct esdhc_platform_data mx6q_gk802_sd3_data __initconst = {
 	.always_present = 1,
 	.keep_power_at_suspend = 1,
 	.support_8bit = 0,
@@ -98,17 +98,17 @@ static const struct esdhc_platform_data mx6q_hdmidongle_sd3_data __initconst = {
 };
 
 static const struct anatop_thermal_platform_data
-	mx6q_hdmidongle_anatop_thermal_data __initconst = {
+	mx6q_gk802_anatop_thermal_data __initconst = {
 		.name = "anatop_thermal",
 };
 
-static inline void mx6q_hdmidongle_init_uart(void)
+static inline void mx6q_gk802_init_uart(void)
 {
   	imx6q_add_imx_uart(1, NULL);
 	imx6q_add_imx_uart(3, NULL);
 }
 
-static struct imxi2c_platform_data mx6q_hdmidongle_i2c_data = {
+static struct imxi2c_platform_data mx6q_gk802_i2c_data = {
 	.bitrate = 100000,
 };
 
@@ -117,7 +117,7 @@ static struct i2c_board_info mxc_i2c1_board_info[] __initdata = {
 		I2C_BOARD_INFO("mxc_hdmi_i2c", 0x50),
 	},
 };
-static void __init imx6q_hdmidongle_init_usb(void)
+static void __init imx6q_gk802_init_usb(void)
 {
 	imx_otg_base = MX6_IO_ADDRESS(MX6Q_USB_OTG_BASE_ADDR);
 	mxc_iomux_set_gpr_register(1, 13, 1, 1);
@@ -129,7 +129,7 @@ static struct viv_gpu_platform_data imx6q_gpu_pdata __initdata = {
 };
 
 
-static struct ipuv3_fb_platform_data hdmidongle_fb_data[] = {
+static struct ipuv3_fb_platform_data gk802_fb_data[] = {
 	{/*fb0*/
 		.disp_dev = "hdmi",
 		.interface_pix_fmt = IPU_PIX_FMT_RGB24,
@@ -169,14 +169,14 @@ static void hdmi_init(int ipu_id, int disp_id)
 
 static void hdmi_enable_ddc_pin(void)
 {
-	mxc_iomux_v3_setup_multiple_pads(mx6q_hdmidongle_hdmi_ddc_pads,
-					ARRAY_SIZE(mx6q_hdmidongle_hdmi_ddc_pads));
+	mxc_iomux_v3_setup_multiple_pads(mx6q_gk802_hdmi_ddc_pads,
+					ARRAY_SIZE(mx6q_gk802_hdmi_ddc_pads));
 }
 
 static void hdmi_disable_ddc_pin(void)
 {
-	mxc_iomux_v3_setup_multiple_pads(mx6q_hdmidongle_i2c2_pads,
-					ARRAY_SIZE(mx6q_hdmidongle_i2c2_pads));
+	mxc_iomux_v3_setup_multiple_pads(mx6q_gk802_i2c2_pads,
+					ARRAY_SIZE(mx6q_gk802_i2c2_pads));
 }
 
 
@@ -215,48 +215,48 @@ static struct ion_platform_data imx_ion_data = {
 };
 #endif
 
-static void hdmidongle_suspend_enter(void)
+static void gk802_suspend_enter(void)
 {
 	/* suspend preparation */
 }
 
-static void hdmidongle_suspend_exit(void)
+static void gk802_suspend_exit(void)
 {
 	/* resume restore */
 }
-static const struct pm_platform_data mx6q_hdmidongle_pm_data __initconst = {
+static const struct pm_platform_data mx6q_gk802_pm_data __initconst = {
 	.name = "imx_pm",
-	.suspend_enter = hdmidongle_suspend_enter,
-	.suspend_exit = hdmidongle_suspend_exit,
+	.suspend_enter = gk802_suspend_enter,
+	.suspend_exit = gk802_suspend_exit,
 };
 
-static struct regulator_consumer_supply hdmidongle_vmmc_consumers[] = {
+static struct regulator_consumer_supply gk802_vmmc_consumers[] = {
 	REGULATOR_SUPPLY("vmmc", "sdhci-esdhc-imx.1"),
 	REGULATOR_SUPPLY("vmmc", "sdhci-esdhc-imx.2"),
 	REGULATOR_SUPPLY("vmmc", "sdhci-esdhc-imx.3"),
 };
 
-static struct regulator_init_data hdmidongle_vmmc_init = {
-	.num_consumer_supplies = ARRAY_SIZE(hdmidongle_vmmc_consumers),
-	.consumer_supplies = hdmidongle_vmmc_consumers,
+static struct regulator_init_data gk802_vmmc_init = {
+	.num_consumer_supplies = ARRAY_SIZE(gk802_vmmc_consumers),
+	.consumer_supplies = gk802_vmmc_consumers,
 };
 
-static struct fixed_voltage_config hdmidongle_vmmc_reg_config = {
+static struct fixed_voltage_config gk802_vmmc_reg_config = {
 	.supply_name		= "vmmc",
 	.microvolts		= 3300000,
 	.gpio			= -1,
-	.init_data		= &hdmidongle_vmmc_init,
+	.init_data		= &gk802_vmmc_init,
 };
 
-static struct platform_device hdmidongle_vmmc_reg_devices = {
+static struct platform_device gk802_vmmc_reg_devices = {
 	.name	= "reg-fixed-voltage",
 	.id	= 3,
 	.dev	= {
-		.platform_data = &hdmidongle_vmmc_reg_config,
+		.platform_data = &gk802_vmmc_reg_config,
 	},
 };
 
-static struct mxc_dvfs_platform_data hdmidongle_dvfscore_data = {
+static struct mxc_dvfs_platform_data gk802_dvfscore_data = {
 	.reg_id = "cpu_vddgp",
 	.soc_id = "cpu_vddsoc",
 	.pu_id = "cpu_vddvpu",
@@ -287,7 +287,7 @@ static void __init fixup_mxc_board(struct machine_desc *desc, struct tag *tags,
 	char *str;
 	struct tag *t;
 	int i = 0;
-	struct ipuv3_fb_platform_data *pdata_fb = hdmidongle_fb_data;
+	struct ipuv3_fb_platform_data *pdata_fb = gk802_fb_data;
 
 	for_each_tag(t, tags) {
 		if (t->hdr.tag == ATAG_CMDLINE) {
@@ -297,7 +297,7 @@ static void __init fixup_mxc_board(struct machine_desc *desc, struct tag *tags,
 				str += 6;
 				pdata_fb[i++].res_size[0] = memparse(str, &str);
 				while (*str == ',' &&
-					i < ARRAY_SIZE(hdmidongle_fb_data)) {
+					i < ARRAY_SIZE(gk802_fb_data)) {
 					str++;
 					pdata_fb[i++].res_size[0] = memparse(str, &str);
 				}
@@ -320,25 +320,25 @@ static void mx6_snvs_poweroff(void)
 /*!
  * Board specific initialization.
  */
-static void __init mx6_hdmidongle_board_init(void)
+static void __init mx6_gk802_board_init(void)
 {
 	int i;
 
-	mxc_iomux_v3_setup_multiple_pads(mx6q_hdmidongle_pads,ARRAY_SIZE(mx6q_hdmidongle_pads));
+	mxc_iomux_v3_setup_multiple_pads(mx6q_gk802_pads,ARRAY_SIZE(mx6q_gk802_pads));
 
-	gp_reg_id = hdmidongle_dvfscore_data.reg_id;
-	soc_reg_id = hdmidongle_dvfscore_data.soc_id;
-	pu_reg_id = hdmidongle_dvfscore_data.pu_id;
+	gp_reg_id = gk802_dvfscore_data.reg_id;
+	soc_reg_id = gk802_dvfscore_data.soc_id;
+	pu_reg_id = gk802_dvfscore_data.pu_id;
 
-	mx6q_hdmidongle_init_uart();
+	mx6q_gk802_init_uart();
 
 	imx6q_add_mxc_hdmi_core(&hdmi_core_data);
 
 	imx6q_add_ipuv3(0, &ipu_data[0]);
 	imx6q_add_ipuv3(1, &ipu_data[1]);
 
-	for (i = 0; i < ARRAY_SIZE(hdmidongle_fb_data); i++)
-		imx6q_add_ipuv3fb(i, &hdmidongle_fb_data[i]);
+	for (i = 0; i < ARRAY_SIZE(gk802_fb_data); i++)
+		imx6q_add_ipuv3fb(i, &gk802_fb_data[i]);
 
 	imx6q_add_vdoa();
 
@@ -348,8 +348,8 @@ static void __init mx6_hdmidongle_board_init(void)
 
 	imx6q_add_imx_caam();
 
-	imx6q_add_imx_i2c(1, &mx6q_hdmidongle_i2c_data);
-	imx6q_add_imx_i2c(2, &mx6q_hdmidongle_i2c_data);
+	imx6q_add_imx_i2c(1, &mx6q_gk802_i2c_data);
+	imx6q_add_imx_i2c(2, &mx6q_gk802_i2c_data);
     
 	i2c_register_board_info(1, mxc_i2c1_board_info,
 			ARRAY_SIZE(mxc_i2c1_board_info));
@@ -357,26 +357,26 @@ static void __init mx6_hdmidongle_board_init(void)
 
 	imx6q_add_mxc_hdmi(&hdmi_data);
 
-	imx6q_add_anatop_thermal_imx(1, &mx6q_hdmidongle_anatop_thermal_data);
-	imx6q_add_pm_imx(0, &mx6q_hdmidongle_pm_data);
+	imx6q_add_anatop_thermal_imx(1, &mx6q_gk802_anatop_thermal_data);
+	imx6q_add_pm_imx(0, &mx6q_gk802_pm_data);
 
 
-	imx6q_add_sdhci_usdhc_imx(3, &mx6q_hdmidongle_sd3_data);
-	imx6q_add_sdhci_usdhc_imx(2, &mx6q_hdmidongle_sd2_data);
+	imx6q_add_sdhci_usdhc_imx(3, &mx6q_gk802_sd3_data);
+	imx6q_add_sdhci_usdhc_imx(2, &mx6q_gk802_sd2_data);
 
 	imx_add_viv_gpu(&imx6_gpu_data, &imx6q_gpu_pdata);
-	imx6q_hdmidongle_init_usb();
+	imx6q_gk802_init_usb();
 
 	imx6q_add_vpu();
 
-	platform_device_register(&hdmidongle_vmmc_reg_devices);
+	platform_device_register(&gk802_vmmc_reg_devices);
 
 	imx6q_add_otp();
 	imx6q_add_viim();
 	imx6q_add_imx2_wdt(0, NULL);
 	imx6q_add_dma();
 
-	imx6q_add_dvfs_core(&hdmidongle_dvfscore_data);
+	imx6q_add_dvfs_core(&gk802_dvfscore_data);
 
 #if defined(CONFIG_ION)
 	imx6q_add_ion(0, &imx_ion_data,
@@ -402,7 +402,7 @@ static void __init mx6_hdmidongle_board_init(void)
 }
 
 extern void __iomem *twd_base;
-static void __init mx6_hdmidongle_timer_init(void)
+static void __init mx6_gk802_timer_init(void)
 {
 	struct clk *uart_clk;
 #ifdef CONFIG_LOCAL_TIMERS
@@ -415,11 +415,11 @@ static void __init mx6_hdmidongle_timer_init(void)
 	early_console_setup(UART4_BASE_ADDR, uart_clk);
 }
 
-static struct sys_timer mx6_hdmidongle_timer = {
-	.init   = mx6_hdmidongle_timer_init,
+static struct sys_timer mx6_gk802_timer = {
+	.init   = mx6_gk802_timer_init,
 };
 
-static void __init mx6q_hdmidongle_reserve(void)
+static void __init mx6q_gk802_reserve(void)
 {
 	phys_addr_t phys;
 	int i;
@@ -440,26 +440,26 @@ static void __init mx6q_hdmidongle_reserve(void)
 	}
 #endif
 
-	for (i = 0; i < ARRAY_SIZE(hdmidongle_fb_data); i++)
-		if (hdmidongle_fb_data[i].res_size[0]) {
+	for (i = 0; i < ARRAY_SIZE(gk802_fb_data); i++)
+		if (gk802_fb_data[i].res_size[0]) {
 			/* reserve for background buffer */
-			phys = memblock_alloc(hdmidongle_fb_data[i].res_size[0],
+			phys = memblock_alloc(gk802_fb_data[i].res_size[0],
 						SZ_4K);
-			memblock_remove(phys, hdmidongle_fb_data[i].res_size[0]);
-			hdmidongle_fb_data[i].res_base[0] = phys;
+			memblock_remove(phys, gk802_fb_data[i].res_size[0]);
+			gk802_fb_data[i].res_base[0] = phys;
 		}
 }
 
 /*
- * initialize __mach_desc_MX6Q_HDMIDONGLE data structure.
+ * initialize __mach_desc_MX6Q_GK802 data structure.
  */
-MACHINE_START(MX6Q_HDMIDONGLE, "Freescale i.MX6q Hi802/GK802 board")
+MACHINE_START(MX6Q_GK802, "Freescale i.MX6q Hi802/GK802 board")
 	/* Maintainer: Dmitriy Beykun */
 	.boot_params = MX6_PHYS_OFFSET + 0x100,
 	.fixup = fixup_mxc_board,
 	.map_io = mx6_map_io,
 	.init_irq = mx6_init_irq,
-	.init_machine = mx6_hdmidongle_board_init,
-	.timer = &mx6_hdmidongle_timer,
-	.reserve = mx6q_hdmidongle_reserve,
+	.init_machine = mx6_gk802_board_init,
+	.timer = &mx6_gk802_timer,
+	.reserve = mx6q_gk802_reserve,
 MACHINE_END
