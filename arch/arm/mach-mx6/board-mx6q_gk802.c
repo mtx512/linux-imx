@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2012 Freescale Semiconductor, Inc. All Rights Reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -67,7 +66,7 @@
 #include "devices-imx6q.h"
 #include "crm_regs.h"
 #include "cpu_op-mx6.h"
-#include "board-mx6q_hdmidongle.h"
+#include "board-mx6q_gk802.h"
 
 /* verified GK802 GPIOs */
 #define HDMIDONGLE_WL_EN        IMX_GPIO_NR(2, 0)
