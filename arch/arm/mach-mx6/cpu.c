@@ -35,7 +35,7 @@
 struct cpu_op *(*get_cpu_op)(int *op);
 bool enable_wait_mode = true;
 u32 enable_ldo_mode = LDO_MODE_DEFAULT;
-u32 arm_max_freq = CPU_AT_1_2GHz;
+u32 arm_max_freq = CPU_AT_1GHz;
 bool mem_clk_on_in_wait;
 bool enet_to_gpio_6;
 int chip_rev;
