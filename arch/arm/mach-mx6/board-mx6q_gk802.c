@@ -440,14 +440,6 @@ static void __init mx6q_gk802_reserve(void)
 	}
 #endif
 
-	for (i = 0; i < ARRAY_SIZE(gk802_fb_data); i++)
-		if (gk802_fb_data[i].res_size[0]) {
-			/* reserve for background buffer */
-			phys = memblock_alloc(gk802_fb_data[i].res_size[0],
-						SZ_4K);
-			memblock_remove(phys, gk802_fb_data[i].res_size[0]);
-			gk802_fb_data[i].res_base[0] = phys;
-		}
 }
 
 /*
