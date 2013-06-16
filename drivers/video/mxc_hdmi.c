@@ -1977,7 +1977,9 @@ static void mxc_hdmi_setup(struct mxc_hdmi *hdmi, unsigned long event)
 		hdmi->hdmi_data.video_mode.mDVI = true;
 	} else {
 		dev_dbg(&hdmi->pdev->dev, "CEA mode used vic=%d\n", hdmi->vic);
-		if (hdmi->edid_cfg.hdmi_cap)
+		/* FIXME hack to get sound when EDID is not properly read
+		 * if we are in 720p or 1080p modes then force CEA mode*/
+		if ((hdmi->edid_cfg.hdmi_cap) || (hdmi->vic == 16) || ( hdmi->vic == 4))
 			hdmi->hdmi_data.video_mode.mDVI = false;
 		else {
 			dev_dbg(&hdmi->pdev->dev, "CEA mode vic=%d work in DVI\n", hdmi->vic);
