@@ -388,11 +388,13 @@ static void __init mx6_gk802_board_init(void)
 
 	gpio_request(HDMIDONGLE_WL_EN, "wl_en");
 	gpio_direction_output(HDMIDONGLE_WL_EN, 1);
-	gpio_set_value(HDMIDONGLE_WL_EN, 1);
+	gpio_set_value(HDMIDONGLE_WL_EN, 0);
+	msleep(1000);
 
 	gpio_request(HDMIDONGLE_BT_EN, "bt_en");
 	gpio_direction_output(HDMIDONGLE_BT_EN, 1);
 	gpio_set_value(HDMIDONGLE_BT_EN, 0);
+	msleep(1000);
 
  	gpio_request(HDMIDONGLE_BT_WK, "bt_wk");
 	gpio_direction_input(HDMIDONGLE_BT_WK);
