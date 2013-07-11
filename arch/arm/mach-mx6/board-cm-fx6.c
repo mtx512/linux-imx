@@ -55,6 +55,7 @@
 #include <linux/regulator/fixed.h>
 #include <linux/mxc_asrc.h>
 #include <linux/mfd/mxc-hdmi-core.h>
+#include <linux/igb.h>
 
 #include <mach/common.h>
 #include <mach/hardware.h>
@@ -1390,6 +1391,10 @@ static struct platform_device cm_fx6_led_device = {
 	},
 };
 
+static struct igb_platform_data cm_fx6_igb_pdata = {
+	.mac_address = {0x00 , 0xA0 , 0xC9, 0x12, 0x34, 0x56},
+};
+
 static void __init cm_fx6_init_led(void)
 {
 	platform_device_register(&cm_fx6_led_device);
@@ -1439,6 +1444,11 @@ static void cm_fx6_init_wifi(void)
 
 	gpio_export(CM_FX6_WIFI_NPD, 0);
 	gpio_export(CM_FX6_WIFI_NRESET, 0);
+}
+
+static void cm_fx6_init_lan(void)
+{
+	igb_set_platform_data(&cm_fx6_igb_pdata);
 }
 
 static struct imx_asrc_platform_data imx_asrc_data = {
@@ -1527,6 +1537,7 @@ static void __init cm_fx6_init(void)
 
 	cm_fx6_i2c_init();
 	cm_fx6_init_led();
+	cm_fx6_init_lan();
 	cm_fx6_init_wifi();
 	cm_fx6_spi_init();
 
