@@ -363,13 +363,20 @@ static struct imx_asrc_platform_data imx_asrc_data = {
 
 static struct ipuv3_fb_platform_data c1_fb_data[] = {
 	{ /*fb0*/
-	.disp_dev = "ldb",
-	.interface_pix_fmt = IPU_PIX_FMT_RGB666,
-	.mode_str = "LDB-XGA",
-	.default_bpp = 16,
+	.disp_dev = "hdmi",
+	.interface_pix_fmt = IPU_PIX_FMT_RGB24,
+	.mode_str = "",
+	.default_bpp = 32,
+
+//	.disp_dev = "ldb",
+//	.interface_pix_fmt = IPU_PIX_FMT_RGB666,
+//	.mode_str = "LDB-XGA",
+//	.default_bpp = 16,
 	.int_clk = false,
 	.late_init = false,
-	}, {
+	}, 
+#ifdef C1_LCD
+    {
 	.disp_dev = "ldb",
 	.interface_pix_fmt = IPU_PIX_FMT_RGB666,
 	.mode_str = "LDB-XGA",
@@ -390,6 +397,7 @@ static struct ipuv3_fb_platform_data c1_fb_data[] = {
 	.int_clk = false,
 	.late_init = false,
 	},
+#endif
 };
 
 static void hdmi_init(int ipu_id, int disp_id)
