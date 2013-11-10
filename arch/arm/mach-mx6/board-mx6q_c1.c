@@ -367,15 +367,8 @@ static struct ipuv3_fb_platform_data c1_fb_data[] = {
 	.interface_pix_fmt = IPU_PIX_FMT_RGB24,
 	.mode_str = "",
 	.default_bpp = 32,
-
-//	.disp_dev = "ldb",
-//	.interface_pix_fmt = IPU_PIX_FMT_RGB666,
-//	.mode_str = "LDB-XGA",
-//	.default_bpp = 16,
 	.int_clk = false,
-	.late_init = false,
 	}, 
-#ifdef C1_LCD
     {
 	.disp_dev = "ldb",
 	.interface_pix_fmt = IPU_PIX_FMT_RGB666,
@@ -397,7 +390,6 @@ static struct ipuv3_fb_platform_data c1_fb_data[] = {
 	.int_clk = false,
 	.late_init = false,
 	},
-#endif
 };
 
 static void hdmi_init(int ipu_id, int disp_id)
@@ -594,6 +586,43 @@ static struct platform_pwm_backlight_data mx6_c1_pwm_dsi_backlight_data = {
 static void __init fixup_mxc_board(struct machine_desc *desc, struct tag *tags,
 				   char **cmdline, struct meminfo *mi)
 {
+	char *str;
+	struct tag *t;
+    int i = 0;
+	struct ipuv3_fb_platform_data *pdata_fb = c1_fb_data;
+
+	for_each_tag(t, tags) {
+     if (t->hdr.tag == ATAG_CMDLINE) {
+       str = t->u.cmdline.cmdline;
+       str = strstr(str, "fbmem=");
+       if (str != NULL) {
+         str += 6;
+         pdata_fb[i++].res_size[0] = memparse(str, &str);
+         while (*str == ',' &&
+           i < ARRAY_SIZE(c1_fb_data)) {
+           str++;
+           pdata_fb[i++].res_size[0] = memparse(str, &str);
+         }
+       }
+
+       /* Primary framebuffer base address */
+       str = t->u.cmdline.cmdline;
+       str = strstr(str, "fb0base=");
+       if (str != NULL) {
+         str += 8;
+         pdata_fb[0].res_base[0] =
+             simple_strtol(str, &str, 16);
+       }
+       /* GPU reserved memory */
+       str = t->u.cmdline.cmdline;
+       str = strstr(str, "gpumem=");
+       if (str != NULL) {
+         str += 7;
+         imx6q_gpu_pdata.reserved_mem_size = memparse(str, &str);
+       }
+       break;
+     }
+   }
 }
 
 static int __init caam_setup(char *__unused)
