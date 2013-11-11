@@ -76,6 +76,9 @@ case "${ARCH}" in
 	x86|i386|x86_64)
 		[ -f "${objtree}/arch/x86/boot/bzImage" ] && cp -v -- "${objtree}/arch/x86/boot/bzImage" "${tmpdir}/boot/vmlinuz-${KERNELRELEASE}"
 		;;
+	arm|armel|armhf)
+		[ -f "${objtree}/arch/arm/boot/uImage" ] && cp -v -- "${objtree}/arch/arm/boot/uImage" "${tmpdir}/boot/uImage-${KERNELRELEASE}"
+		;;
 	alpha)
 		[ -f "${objtree}/arch/alpha/boot/vmlinux.gz" ] && cp -v -- "${objtree}/arch/alpha/boot/vmlinux.gz" "${tmpdir}/boot/vmlinuz-${KERNELRELEASE}"
 		;;
