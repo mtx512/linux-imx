@@ -129,9 +129,11 @@ extern void (*put_cpu_regulator)(void);
 
 	/* SD_primary */
 static const struct esdhc_platform_data mx6q_seco_UDOO_sd3_data __initconst = {
-	.cd_gpio = MX6_SECO_UDOO_SD3_CD,			
-	.always_present = 1,
-	.keep_power_at_suspend = 1,
+    .cd_gpio = MX6_SECO_UDOO_SD3_CD,
+    .keep_power_at_suspend = 1,
+    .support_8bit = 0,
+    .delay_line = 0,
+    .cd_type = ESDHC_CD_CONTROLLER,
 };
 
 
@@ -448,6 +450,7 @@ static struct ipuv3_fb_platform_data seco_UDOO_fb_data[] = {
      .default_bpp = 32,
      .int_clk = false,
      }, 
+#ifdef CONFIG_UDOO_LCD
 	{
 	.disp_dev = "ldb",
 	.interface_pix_fmt = IPU_PIX_FMT_RGB24,
@@ -467,6 +470,7 @@ static struct ipuv3_fb_platform_data seco_UDOO_fb_data[] = {
 	.default_bpp = 16,
 	.int_clk = false,
 	},
+#endif
 };
 
 static struct fsl_mxc_lcd_platform_data lcdif_data = {
@@ -660,7 +664,7 @@ static struct imxi2c_platform_data mx6q_seco_UDOO_i2c0_data = {
 };
 
 static struct imxi2c_platform_data mx6q_seco_UDOO_i2c1_data = {
-	.bitrate = 400000,
+	.bitrate = 100000,
 };
 
 static struct imxi2c_platform_data mx6q_seco_UDOO_i2c2_data = {
