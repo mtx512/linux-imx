@@ -317,6 +317,8 @@ config MACH_MX6_SECO_UDOO
         select IMX_HAVE_PLATFORM_IMX_MIPI_CSI2
         select IMX_HAVE_PLATFORM_IMX_CAAM
 		select IMX_HAVE_PLATFORM_PERFMON
+	    select IMX_HAVE_PLATFORM_IMX_PCIE
+	    select IMX_HAVE_PLATFORM_IMX_SSI
         help
           Include support for i.MX6 DualLite and Quad SECO UDOO platform. This includes specific
           configurations for the board and its peripherals.
