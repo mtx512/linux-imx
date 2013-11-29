@@ -239,7 +239,7 @@ static struct at24_platform_data utilite_eeprom_1_pdata __initdata = {
 	.setup		= utilite_eeprom_1_setup,
 };
 
-static struct igb_platform_data uilite_igb_pdata;
+static struct igb_platform_data utilite_igb_pdata;
 
 static void __init utilite_eeprom_2_setup(struct memory_accessor *mem_acc, void *context) {
 //	eeprom_read_mac_address(mem_acc, utilite_igb_pdata.mac_address);
@@ -719,7 +719,6 @@ static void __init cm_fx6_spdif_init(void)
 	imx6q_add_spdif_dai();
 	imx6q_add_spdif_audio_device();
 }
-
 
 
 static void cm_wifi_init(void) {
