@@ -30,6 +30,7 @@ obj-$(CONFIG_SND_SOC_IMX_WM8958) += snd-soc-imx-wm8958.o
 obj-$(CONFIG_SND_SOC_IMX_WM8962) += snd-soc-imx-wm8962.o
 obj-$(CONFIG_SND_SOC_IMX_SGTL5000) += snd-soc-imx-sgtl5000.o
 obj-$(CONFIG_SND_SOC_IMX_CS42888) += snd-soc-imx-cs42888.o
+obj-$(CONFIG_SND_SOC_CM_FX6) += snd-soc-cm-fx6.o
 obj-$(CONFIG_SND_SOC_IMX_SPDIF) += snd-soc-imx-spdif.o
 obj-$(CONFIG_SND_SOC_IMX_HDMI) += snd-soc-imx-hdmi.o
 obj-$(CONFIG_SND_SOC_IMX_SI4763) += snd-soc-imx-si4763.o
