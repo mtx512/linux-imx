@@ -58,6 +58,7 @@
 #include <sound/wm8962.h>
 #include <linux/mfd/mxc-hdmi-core.h>
 #include <linux/gpio-i2cmux.h>
+#include <linux/igb.h>
 
 #include <mach/common.h>
 #include <mach/hardware.h>
@@ -196,9 +197,9 @@ static struct fec_platform_data fec_data __initdata = {
 	.gpio_irq = MX6_ENET_IRQ,
 };
 
-#define EEPROM_1ST_MAC_OFF		4
-#define EEPROM_BOARD_NAME_OFF		128
-#define EEPROM_BOARD_NAME_LEN		16
+#define EEPROM_1ST_MAC_OFF      4
+#define EEPROM_BOARD_NAME_OFF   128
+#define EEPROM_BOARD_NAME_LEN   16
 
 static int eeprom_read(struct memory_accessor *mem_acc, unsigned char *buf,
 		       int offset, int size, const char* objname)
@@ -222,9 +223,9 @@ static void eeprom_read_mac_address(struct memory_accessor *mem_acc,
 		memset(mac, 0, ETH_ALEN);
 }
 
-static void __init utilite_eeprom_setup(struct memory_accessor *mem_acc, void *context) {
+static void __init utilite_eeprom_1_setup(struct memory_accessor *mem_acc, void *context) {
 	eeprom_read_mac_address(mem_acc, fec_data.mac);
-//	printk(KERN_INFO "eth0 MAC is %02X:%02X:%02X:%02X:%02X:%02X\n",fec_data.mac[0],
+//	printk(KERN_INFO "FEC MAC is %02X:%02X:%02X:%02X:%02X:%02X\n",fec_data.mac[0],
 //		fec_data.mac[1],fec_data.mac[2],fec_data.mac[3],fec_data.mac[4],fec_data.mac[5]);
 
 	/** Can't call "imx6_init_fec(fec_data);" because it will generate a random
@@ -232,10 +233,30 @@ static void __init utilite_eeprom_setup(struct memory_accessor *mem_acc, void *c
 	imx6q_add_fec(&fec_data);
 }
 
-static struct at24_platform_data utilite_eeprom_pdata __initdata = {
+static struct at24_platform_data utilite_eeprom_1_pdata __initdata = {
 	.byte_len  	= 256,
 	.page_size  = 16,
-	.setup		= utilite_eeprom_setup,
+	.setup		= utilite_eeprom_1_setup,
+};
+
+static struct igb_platform_data uilite_igb_pdata;
+
+static void __init utilite_eeprom_2_setup(struct memory_accessor *mem_acc, void *context) {
+//	eeprom_read_mac_address(mem_acc, utilite_igb_pdata.mac_address);
+//	printk(KERN_INFO "IGB MAC is %02X:%02X:%02X:%02X:%02X:%02X\n",utilite_igb_pdata.mac_address[0],
+//		utilite_igb_pdata.mac_address[1],utilite_igb_pdata.mac_address[2],
+//		utilite_igb_pdata.mac_address[3],utilite_igb_pdata.mac_address[4],
+//		utilite_igb_pdata.mac_address[5]);
+
+	igb_set_platform_data(&utilite_igb_pdata);
+	imx6q_add_pcie(&cm_utilite_pcie_data);
+
+}
+
+static struct at24_platform_data utilite_eeprom_2_pdata __initdata = {
+	.byte_len  	= 256,
+	.page_size  = 16,
+	.setup		= utilite_eeprom_2_setup,
 };
 
 static void cm_utilite_dvi_init(void)
@@ -273,9 +294,9 @@ static struct i2c_board_info mxc_i2c1_board_info[] __initdata = {
 };
 
 static struct i2c_board_info mxc_i2c2_board_info[] __initdata = {
-	{
+	{	/** 1st eeprom with MAC for imx6 phy **/
 		I2C_BOARD_INFO("at24", 0x50),
-		.platform_data = &utilite_eeprom_pdata,
+		.platform_data = &utilite_eeprom_1_pdata,
 	},
 	{
 		I2C_BOARD_INFO("wm8731", 0x1a),
@@ -286,6 +307,10 @@ static struct i2c_board_info cm_utilite_i2c0c3_board_info[] __initdata = {
 	{
 		I2C_BOARD_INFO("em3027", 0x56),
 	},
+	{	/** 2nd eeprom with MAC for IGB (PCIE) ethernet **/
+		I2C_BOARD_INFO("at24", 0x50),
+		.platform_data = &utilite_eeprom_2_pdata,
+	}
 };
 
 static struct i2c_board_info cm_utilite_i2c0c4_board_info[] __initdata = {
@@ -824,8 +849,6 @@ static void __init cm_utilite_board_init(void) {
 	pm_power_off = mx6_snvs_poweroff;
 
 	cm_wifi_init();
-
-	imx6q_add_pcie(&cm_utilite_pcie_data);
 
 	imx6_add_armpmu();
 	imx6q_add_perfmon(0);
