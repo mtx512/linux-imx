@@ -104,6 +104,7 @@
 #define MX6_ENET_IRQ		    	IMX_GPIO_NR(1, 6)
 
 #define CM_UTILITE_DVI_DDC_SEL		IMX_GPIO_NR(1, 2)
+#define CM_UTILITE_DVI_HPD			IMX_GPIO_NR(1, 4)
 
 #define CM_UTILITE_WIFI_NPD			IMX_GPIO_NR(7, 12)
 #define CM_UTILITE_WIFI_NRESET		IMX_GPIO_NR(6, 16)
@@ -237,6 +238,30 @@ static struct at24_platform_data utilite_eeprom_pdata __initdata = {
 	.setup		= utilite_eeprom_setup,
 };
 
+static void cm_utilite_dvi_init(void)
+{
+	int err;
+
+	err = gpio_request(CM_UTILITE_DVI_HPD, "dvi detect");
+	if (err)
+		pr_err("%s > error %d\n", __func__, err);
+
+	gpio_direction_input(CM_UTILITE_DVI_HPD);
+}
+
+static int cm_utilite_dvi_update(void)
+{
+	return gpio_get_value(CM_UTILITE_DVI_HPD);
+}
+
+static struct fsl_mxc_dvi_platform_data cm_utilite_dvi_data = {
+	.ipu_id		= 0,
+	.disp_id	= 0,
+	.init		= cm_utilite_dvi_init,
+	.update		= cm_utilite_dvi_update,
+};
+
+
 static struct imxi2c_platform_data cm_utilite_i2c_data = {
     .bitrate = 100000,
 };
@@ -261,6 +286,14 @@ static struct i2c_board_info cm_utilite_i2c0c3_board_info[] __initdata = {
 	{
 		I2C_BOARD_INFO("em3027", 0x56),
 	},
+};
+
+static struct i2c_board_info cm_utilite_i2c0c4_board_info[] __initdata = {
+	{
+		I2C_BOARD_INFO("mxc_dvi", 0x50),
+		.irq = gpio_to_irq(CM_UTILITE_DVI_HPD),
+		.platform_data = &cm_utilite_dvi_data,
+	}
 };
 
 static void __init i2c_register_bus_binfo(int busnum,
@@ -326,10 +359,12 @@ static void cm_utilite_i2c_init(void)
 	/* I2C multiplexing: I2C-0 --> I2C-3, I2C-4 */
 	platform_device_register(&cm_utilite_i2cmux);
 
-	/* register the virtual bus 3 */
+	/* register the virtual bus 3 & 4 */
 	i2c_register_bus_binfo(3, NULL, cm_utilite_i2c0c3_board_info,
 			       ARRAY_SIZE(cm_utilite_i2c0c3_board_info));
 
+	i2c_register_bus_binfo(4, NULL, cm_utilite_i2c0c4_board_info,
+			       ARRAY_SIZE(cm_utilite_i2c0c4_board_info));
 }
 
 static void hdmi_init(int ipu_id, int disp_id)
@@ -374,7 +409,13 @@ static struct ipuv3_fb_platform_data utilite_fb_data[] = {
 		.mode_str = "",
 		.default_bpp = 32,
 		.int_clk = false,
-	},
+	}, {
+	.disp_dev		= "dvi",
+	.interface_pix_fmt	= IPU_PIX_FMT_RGB32,
+	.mode_str		= "1280x800@60",
+	.default_bpp		= 32,
+	.int_clk		= false,
+	}
 };
 
 static struct viv_gpu_platform_data imx6q_gpu_pdata __initdata = {
