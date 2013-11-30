@@ -55,7 +55,6 @@
 #include <linux/regulator/fixed.h>
 #include <linux/mfd/wm8994/pdata.h>
 #include <linux/mfd/wm8994/gpio.h>
-#include <sound/wm8962.h>
 #include <linux/mfd/mxc-hdmi-core.h>
 #include <linux/gpio-i2cmux.h>
 #include <linux/igb.h>
@@ -242,7 +241,7 @@ static struct at24_platform_data utilite_eeprom_1_pdata __initdata = {
 static struct igb_platform_data utilite_igb_pdata;
 
 static void __init utilite_eeprom_2_setup(struct memory_accessor *mem_acc, void *context) {
-//	eeprom_read_mac_address(mem_acc, utilite_igb_pdata.mac_address);
+	eeprom_read_mac_address(mem_acc, utilite_igb_pdata.mac_address);
 //	printk(KERN_INFO "IGB MAC is %02X:%02X:%02X:%02X:%02X:%02X\n",utilite_igb_pdata.mac_address[0],
 //		utilite_igb_pdata.mac_address[1],utilite_igb_pdata.mac_address[2],
 //		utilite_igb_pdata.mac_address[3],utilite_igb_pdata.mac_address[4],
@@ -476,7 +475,6 @@ static const struct pm_platform_data cm_utilite_pm_data __initconst = {
 
 static struct regulator_consumer_supply utilite_vmmc_consumers[] = {
 	REGULATOR_SUPPLY("vmmc", "sdhci-esdhc-imx.1"),
-	REGULATOR_SUPPLY("vmmc", "sdhci-esdhc-imx.2"),
 	REGULATOR_SUPPLY("vmmc", "sdhci-esdhc-imx.3"),
 };
 
@@ -721,6 +719,202 @@ static void __init cm_fx6_spdif_init(void)
 }
 
 
+static struct regulator_consumer_supply cm_utilite_wm8731_consumers[] = {
+	REGULATOR_SUPPLY("AVDD", "2-001a"),
+	REGULATOR_SUPPLY("HPVDD", "2-001a"),
+	REGULATOR_SUPPLY("DCVDD", "2-001a"),
+	REGULATOR_SUPPLY("DBVDD", "2-001a"),
+};
+
+static struct regulator_init_data cm_utilite_wm8731_init = {
+	.num_consumer_supplies = ARRAY_SIZE(cm_utilite_wm8731_consumers),
+	.consumer_supplies = cm_utilite_wm8731_consumers,
+};
+
+static struct fixed_voltage_config cm_utilite_wm8731_reg_config = {
+	.supply_name	= "wm8731",
+	.microvolts		= 3300000,
+	.gpio			= -1,
+	.init_data		= &cm_utilite_wm8731_init,
+};
+
+static struct platform_device cm_utilite_wm8731_reg_devices = {
+	.name	= "reg-fixed-voltage",
+	.id		= 4,
+	.dev	= {
+		.platform_data = &cm_utilite_wm8731_reg_config,
+	},
+};
+
+#define	WM8731_MCLK_FREQ	(24000000 / 2)
+
+static int audmod_master;
+
+static int __init early_set_audio_mode(char *p)
+{
+	audmod_master = 1;
+	return 0;
+}
+early_param("audmod-mst", early_set_audio_mode);
+
+static struct imx_ssi_platform_data cm_utilite_ssi_pdata = {
+	.flags = IMX_SSI_DMA | IMX_SSI_SYN,
+};
+
+static struct mxc_audio_platform_data cm_utilite_audio_data;
+
+static struct {
+	struct clk *pll;
+	struct clk *clock_root;
+	long current_rate;
+
+} cm_utilite_audio_clocking_data;
+
+static int wm8731_slv_mode_init(void) {
+	struct clk *new_parent;
+	struct clk *ssi_clk;
+
+	new_parent = clk_get(NULL, "pll4");
+	if (IS_ERR(new_parent)) {
+		pr_err("Could not get \"pll4\" clock \n");
+		return PTR_ERR(new_parent);
+	}
+
+	ssi_clk = clk_get_sys("imx-ssi.1", NULL);
+	if (IS_ERR(ssi_clk)) {
+		pr_err("Could not get \"imx-ssi.1\" clock \n");
+		return PTR_ERR(ssi_clk);
+	}
+
+	clk_set_parent(ssi_clk, new_parent);
+
+	cm_utilite_audio_clocking_data.pll = new_parent;
+	cm_utilite_audio_clocking_data.clock_root = ssi_clk;
+	cm_utilite_audio_clocking_data.current_rate = 0;
+
+	cm_utilite_audio_data.sysclk = 0;
+
+	return 0;
+}
+
+static int wm8731_slv_mode_clock_enable(int enable) {
+	long pll_rate;
+	long rate_req;
+	long rate_avail;
+
+	if (!enable)
+		return 0;
+
+	if (cm_utilite_audio_data.sysclk == cm_utilite_audio_clocking_data.current_rate)
+		return 0;
+
+	switch (cm_utilite_audio_data.sysclk) {
+		case 11289600:
+			pll_rate = 632217600;
+			break;
+
+		case 12288000:
+			pll_rate = 688128000;
+			break;
+
+		default:
+			return -EINVAL;
+	}
+
+	rate_req = pll_rate;
+	rate_avail = clk_round_rate(cm_utilite_audio_clocking_data.pll, rate_req);
+	clk_set_rate(cm_utilite_audio_clocking_data.pll, rate_avail);
+
+	rate_req = cm_utilite_audio_data.sysclk;
+	rate_avail = clk_round_rate(cm_utilite_audio_clocking_data.clock_root,
+				    rate_req);
+	clk_set_rate(cm_utilite_audio_clocking_data.clock_root, rate_avail);
+
+	pr_info("%s: \"imx-ssi.1\" rate = %ld (= %ld)\n",
+		__func__, rate_avail, rate_req);
+	cm_utilite_audio_clocking_data.current_rate = cm_utilite_audio_data.sysclk;
+
+	return 0;
+}
+
+static int wm8731_mst_mode_init(void) {
+	long rate;
+	struct clk *clko2;
+	struct clk *clko;
+
+	clko2 = clk_get(NULL, "clko2_clk");
+	if (IS_ERR(clko2)) {
+		pr_err("Could not get CLKO2 clock \n");
+		return PTR_ERR(clko2);
+	}
+	rate = clk_round_rate(clko2, WM8731_MCLK_FREQ);
+	clk_set_rate(clko2, rate);
+
+	clko = clk_get(NULL, "clko_clk");
+	if (IS_ERR(clko)) {
+		pr_err("Could not get CLKO clock \n");
+		return PTR_ERR(clko);
+	}
+
+	clk_set_parent(clko, clko2);
+
+	rate = clk_round_rate(clko, WM8731_MCLK_FREQ);
+	clk_set_rate(clko, rate);
+
+	pr_info("%s: \"CLKO\" rate = %ld (= %d)\n",
+		__func__, rate, WM8731_MCLK_FREQ);
+	cm_utilite_audio_clocking_data.clock_root = clko;
+	cm_utilite_audio_data.sysclk = rate;
+
+	return 0;
+}
+
+static int wm8731_mst_mode_clock_enable(int enable) {
+	struct clk *clko = cm_utilite_audio_clocking_data.clock_root;
+
+	if (enable)
+		return clk_enable(clko);
+
+	clk_disable(clko);
+	return 0;
+}
+
+static struct platform_device cm_utilite_audio_device = {
+	.name	= "imx-wm8731",
+	.id	= -1,
+};
+
+static struct mxc_audio_platform_data cm_utilite_audio_data = {
+	.ssi_num	= 1,
+	.src_port	= 2,
+	.ext_port	= 4,	/* AUDMUX: port[2] -> port[4] */
+	.hp_gpio	= -1,
+	.mic_gpio	= -1,
+	.init		= wm8731_slv_mode_init,
+	.clock_enable	= wm8731_slv_mode_clock_enable,
+	.codec_name	= "wm8731-slv-mode",
+};
+
+static int __init cm_utilite_init_audio(void) {
+
+	if (audmod_master) {
+		/*
+		 * For the master mode to work correctly, cm-fx6 should have:
+		 * R105 populated and R104 removed.
+		 */
+		mxc_iomux_v3_setup_pad(MX6Q_PAD_GPIO_5__CCM_CLKO);
+
+		cm_utilite_audio_data.init = wm8731_mst_mode_init;
+		cm_utilite_audio_data.clock_enable = wm8731_mst_mode_clock_enable;
+		cm_utilite_audio_data.codec_name = "wm8731-mst-mode";
+	}
+
+	platform_device_register(&cm_utilite_wm8731_reg_devices);
+	mxc_register_device(&cm_utilite_audio_device, &cm_utilite_audio_data);
+	imx6q_add_imx_ssi(1, &cm_utilite_ssi_pdata);
+	return 0;
+}
+
 static void cm_wifi_init(void) {
 	gpio_request(CM_UTILITE_WIFI_NPD, "wifi pdn");
 	gpio_request(CM_UTILITE_WIFI_NRESET, "wifi rstn");
@@ -831,6 +1025,7 @@ static void __init cm_utilite_board_init(void) {
 	imx6q_add_dvfs_core(&utilite_dvfscore_data);
 
 	cm_fx6_spdif_init();
+	cm_utilite_init_audio();
 
 	clko2 = clk_get(NULL, "clko2_clk");
 	if (IS_ERR(clko2))
@@ -853,6 +1048,7 @@ static void __init cm_utilite_board_init(void) {
 	imx6q_add_perfmon(0);
 	imx6q_add_perfmon(1);
 	imx6q_add_perfmon(2);
+
 
 }
 
