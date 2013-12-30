@@ -795,7 +795,15 @@ void set_gpios_directions(void)
 		printk("#### No gpios to export");	
 }
 
-
+#define SNVS_LPCR 0x38
+static void mx6_snvs_poweroff(void)
+{
+    void __iomem *mx6_snvs_base =  MX6_IO_ADDRESS(MX6Q_SNVS_BASE_ADDR);
+    u32 value;
+    value = readl(mx6_snvs_base + SNVS_LPCR);
+    /*set TOP and DP_EN bit*/
+    writel(value | 0x60, mx6_snvs_base + SNVS_LPCR);
+}
 
 /***********************************************************************
  *                               BOARD INIT                            *
@@ -973,6 +981,9 @@ static void __init mx6_seco_UDOO_board_init(void)
 	rate = clk_round_rate(clko2, 24000000);
 	clk_set_rate(clko2, rate);
 	clk_enable(clko2);
+
+	pm_power_off = mx6_snvs_poweroff;
+
 	imx6q_add_busfreq();
 
 	imx6_add_armpmu();
