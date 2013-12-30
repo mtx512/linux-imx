@@ -446,6 +446,15 @@ static struct viv_gpu_platform_data imx6q_gpu_pdata __initdata = {
 	.reserved_mem_size = SZ_128M,
 };
 
+struct imx_vout_mem {
+	resource_size_t res_mbase;
+	resource_size_t res_msize;
+};
+
+static struct imx_vout_mem vout_mem __initdata = {
+	.res_msize = SZ_128M,
+};
+
 static struct imx_asrc_platform_data imx_asrc_data = {
 	.channel_bits = 4,
     .clk_map_ver = 2,
@@ -947,6 +956,7 @@ static void __init cm_utilite_board_init(void) {
     struct clk *clko2;
     struct clk *new_parent;
     int rate;
+    struct platform_device *voutdev;
 
 	mxc_iomux_v3_setup_multiple_pads(utilite_common_pads,
         	ARRAY_SIZE(utilite_common_pads));
@@ -985,6 +995,16 @@ static void __init cm_utilite_board_init(void) {
 	
 	cm_utilite_i2c_init();
  
+	voutdev = imx6q_add_v4l2_output(0);
+	if (vout_mem.res_msize && voutdev) {
+		dma_declare_coherent_memory(&voutdev->dev,
+					    vout_mem.res_mbase,
+					    vout_mem.res_mbase,
+					    vout_mem.res_msize,
+					    (DMA_MEMORY_MAP |
+					     DMA_MEMORY_EXCLUSIVE));
+	}
+
 	imx6q_add_vdoa();
 
 	imx6q_add_anatop_thermal_imx(1, &cm_utilite_anatop_thermal_data);
@@ -1041,6 +1061,7 @@ static void __init cm_utilite_board_init(void) {
 	clk_enable(clko2);
 
 	pm_power_off = mx6_snvs_poweroff;
+	imx6q_add_busfreq();
 
 	cm_wifi_init();
 
@@ -1087,6 +1108,13 @@ static void __init cm_utilite_reserve(void) {
     	imx6q_gpu_pdata.reserved_mem_base = phys;
     }
 #endif
+
+	if (vout_mem.res_msize) {
+		phys = memblock_alloc_base(vout_mem.res_msize,
+					   SZ_4K, SZ_1G);
+		memblock_remove(phys, vout_mem.res_msize);
+		vout_mem.res_mbase = phys;
+	}
 }
 
 /*
