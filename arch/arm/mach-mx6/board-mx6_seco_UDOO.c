@@ -110,6 +110,8 @@
 
 //#define MX6_SECO_UDOO_CAP_TCH_INT1	IMX_GPIO_NR(1, 9)
 
+#define UDOO_SAM3X_RESET        IMX_GPIO_NR(1,0)
+#define UDOO_DISABLE_5V         IMX_GPIO_NR(2,4)
 
 void __init early_console_setup(unsigned long base, struct clk *clk);
 static struct clk *sata_clk;
@@ -803,6 +805,13 @@ static void mx6_snvs_poweroff(void)
     value = readl(mx6_snvs_base + SNVS_LPCR);
     /*set TOP and DP_EN bit*/
     writel(value | 0x60, mx6_snvs_base + SNVS_LPCR);
+
+    // Power down SAM3X and UDOO
+    gpio_request (UDOO_SAM3X_RESET, "sam3x-reset");
+    gpio_direction_output(UDOO_SAM3X_RESET, 0);
+    msleep(5);
+    gpio_request (UDOO_DISABLE_5V, "disable-5v");
+    gpio_direction_output (UDOO_DISABLE_5V, 1);
 }
 
 /***********************************************************************
