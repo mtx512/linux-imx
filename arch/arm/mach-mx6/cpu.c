@@ -66,6 +66,12 @@ static int mx6_get_srev(void)
 		return IMX_CHIP_REVISION_1_1;
 	else if (rev == 2)
 		return IMX_CHIP_REVISION_1_2;
+	else if (rev == 3)
+		return IMX_CHIP_REVISION_1_3;
+	else if (rev == 4)
+		return IMX_CHIP_REVISION_1_4;
+	else if (rev == 5)
+		return IMX_CHIP_REVISION_1_5;
 
 	return IMX_CHIP_REVISION_UNKNOWN;
 }
@@ -148,6 +154,12 @@ static int __init post_cpu_init(void)
 	reg = __raw_readl(base + 0x50) & 0x00FFFFFF;
 	__raw_writel(reg, base + 0x50);
 	iounmap(base);
+
+	/* Force IOMUXC irq to be pending for CCM LPM */
+	base = IO_ADDRESS(MX6Q_IOMUXC_BASE_ADDR);
+	reg = __raw_readl(base + 0x4);
+	reg |= 0x1000;
+	__raw_writel(reg, base + 0x4);
 
 	/* Allow SCU_CLK to be disabled when all cores are in WFI*/
 	base = IO_ADDRESS(SCU_BASE_ADDR);

@@ -110,6 +110,8 @@
 
 //#define MX6_SECO_UDOO_CAP_TCH_INT1	IMX_GPIO_NR(1, 9)
 
+#define UDOO_SAM3X_RESET        IMX_GPIO_NR(1,0)
+#define UDOO_DISABLE_5V         IMX_GPIO_NR(2,4)
 
 void __init early_console_setup(unsigned long base, struct clk *clk);
 static struct clk *sata_clk;
@@ -795,7 +797,22 @@ void set_gpios_directions(void)
 		printk("#### No gpios to export");	
 }
 
+#define SNVS_LPCR 0x38
+static void mx6_snvs_poweroff(void)
+{
+    void __iomem *mx6_snvs_base =  MX6_IO_ADDRESS(MX6Q_SNVS_BASE_ADDR);
+    u32 value;
+    value = readl(mx6_snvs_base + SNVS_LPCR);
+    /*set TOP and DP_EN bit*/
+    writel(value | 0x60, mx6_snvs_base + SNVS_LPCR);
 
+    // Power down SAM3X and UDOO
+    gpio_request (UDOO_SAM3X_RESET, "sam3x-reset");
+    gpio_direction_output(UDOO_SAM3X_RESET, 0);
+    msleep(5);
+    gpio_request (UDOO_DISABLE_5V, "disable-5v");
+    gpio_direction_output (UDOO_DISABLE_5V, 1);
+}
 
 /***********************************************************************
  *                               BOARD INIT                            *
@@ -973,6 +990,9 @@ static void __init mx6_seco_UDOO_board_init(void)
 	rate = clk_round_rate(clko2, 24000000);
 	clk_set_rate(clko2, rate);
 	clk_enable(clko2);
+
+	pm_power_off = mx6_snvs_poweroff;
+
 	imx6q_add_busfreq();
 
 	imx6_add_armpmu();
