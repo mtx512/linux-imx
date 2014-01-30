@@ -130,4 +130,17 @@ config SND_MXC_SOC_IRAM
 	help
 	  Say Y if you don't want Audio playback buffers in external ram
 
+config SND_SOC_IMX_AC97_VT1613
+	tristate "SoC Audio support for Seco Q7 i.MX boards with vt1613 AC97 codec"
+	depends on MACH_MX6_SECO_UDOO
+	select SND_SOC_VT1613
+	select SND_MXC_SOC_MX2
+	help
+	  Say Y if you want to add support for SoC audio on an i.MX board with
+	  AC97 codec vt1613.
+	  select SND_MXC_SOC_FIQ
+	  config SND_SOC_IMX_AC97_VT1613
+	  select SND_MXC_SOC_MX2
+
+
 endif	# SND_IMX_SOC
