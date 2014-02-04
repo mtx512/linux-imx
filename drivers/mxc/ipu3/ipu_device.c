@@ -3138,7 +3138,12 @@ static int ipu_task_thread(void *argv)
 		int split_parent;
 		int split_child;
 
+<<<<<<< HEAD
+		if(wait_event_interruptible(thread_waitq, find_task(&tsk, curr_thread_id)))
+                  break;
+=======
 		wait_event_interruptible(thread_waitq, find_task(&tsk, curr_thread_id));
+>>>>>>> cab446d7433162c4ee2788b05b5e32708f124bf6
 
 		if (!tsk) {
 			pr_err("thread:%d can not find task.\n",
